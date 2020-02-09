@@ -7,8 +7,8 @@ project(
     LANGUAGES CXX
 )
 
-# Build with C++11
-set(CMAKE_CXX_STANDARD 11)
+# Build with C++14
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Compiler options
