@@ -5,6 +5,11 @@ https://llvm.org/docs/tutorial/MyFirstLanguageFrontend
 
 ## Building
 
+Quick build:
+```bash
+./build.sh
+```
+
 Minimum Requirements:
 - \>= CMake-3.10
 

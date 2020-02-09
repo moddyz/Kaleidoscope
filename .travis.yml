@@ -32,8 +32,4 @@ branches:
   only:
     - master
 
-script: 
-  - mkdir -p build
-  - cd build
-  - cmake ..
-  - cmake --build .
+script: ./build.sh ~/kaleidoscope
