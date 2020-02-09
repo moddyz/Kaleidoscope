@@ -3,11 +3,13 @@
 set -euxo pipefail
 
 mkdir -p build && cd build
+
+# Only build if installation path not specified.
 if [ $# -eq 0 ]
 then
-    echo "build.sh: Please specify installation path as the first argument."
-    exit 1
+    cmake ..
+    cmake --build .
 else
     cmake -DCMAKE_INSTALL_PREFIX=$1 ..
+    cmake --build . --target install
 fi
-cmake --build . --target install
