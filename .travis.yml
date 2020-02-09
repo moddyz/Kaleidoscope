@@ -13,6 +13,7 @@ jobs:
             - gcc-6
             - g++-6
             - cmake
+      env: CXX=g++-6 CC=gcc-6
 
 install:
   - echo ${PATH}
