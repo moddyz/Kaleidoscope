@@ -14,5 +14,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Compiler options
 add_compile_options(-g -O3)
 
-# Build kaleidoscope library.
+# Build kaleidoscope targets.
 add_subdirectory(kaleidoscope)
+add_subdirectory(kaleidoscopeDriver)

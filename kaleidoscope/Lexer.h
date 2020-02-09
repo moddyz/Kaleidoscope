@@ -16,16 +16,16 @@ enum Token
 
     // Primary.
     Token_Identifier = -4,
-    Token_Number     = -5
+    Token_Numeric     = -5
 };
 
 /// Return the next Token from standard input.
-static int LexerNextToken();
+int GetNextToken();
 
-/// Get the value of the last parsed Identifier token.
-static const std::string& LexerGetIdentifierValue();
+/// Get the value of the last Identifier token.
+const std::string& GetIdentifierValue();
 
-/// Get the value of the last parsed Number token.
-static double LexerGetNumberValue();
+/// Get the value of the last Numeric token.
+double GetNumericValue();
 
 } // namespace kaleidoscope
