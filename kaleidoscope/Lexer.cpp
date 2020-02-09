@@ -4,12 +4,11 @@ namespace
 {
 /// Static storage of different types of token values.
 static std::string s_identifierValue = "";
-static double s_numberValue = 0.0;
-}
+static double      s_numberValue     = 0.0;
+} // namespace
 
 namespace kaleidoscope
 {
-
 int LexerNextToken()
 {
     static int lastChar = ' ';
@@ -21,14 +20,14 @@ int LexerNextToken()
     }
 
     if ( isalpha( lastChar ) )
-    {   
+    {
         // Handle non-numerical tokens.
         s_identifierValue = lastChar;
         while ( isalnum( lastChar = getchar() ) )
         {
             s_identifierValue += lastChar;
         }
-        
+
         if ( s_identifierValue == "def" )
         {
             return Token_Def;
@@ -40,11 +39,12 @@ int LexerNextToken()
 
         return Token_Identifier;
     }
-    else if ( isdigit( lastChar ) || lastChar == '.' ) 
+    else if ( isdigit( lastChar ) || lastChar == '.' )
     {
         // Handle numerical double-precision tokens.
         std::string numberStr;
-        do {
+        do
+        {
             numberStr += lastChar;
             lastChar = getchar();
         } while ( isdigit( lastChar ) || lastChar == '.' );
@@ -58,8 +58,8 @@ int LexerNextToken()
     }
     else
     {
-        int thisCharInt = (int) lastChar;
-        lastChar = getchar(); 
+        int thisCharInt = ( int ) lastChar;
+        lastChar        = getchar();
         return thisCharInt;
     }
 }
@@ -74,4 +74,4 @@ double LexerGetNumberValue()
     return s_numberValue;
 }
 
-} // kaleidoscope
+} // namespace kaleidoscope
