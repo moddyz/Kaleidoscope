@@ -1,0 +1,31 @@
+language: cpp
+
+os: linux
+
+jobs:
+  include:
+    - os: linux
+      dist: bionic
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - gcc-6
+            - g++-6
+            - cmake
+
+install:
+  - echo ${PATH}
+  - echo ${CXX}
+  - ${CXX} --version
+  - cmake --version
+
+branches:
+  only:
+    - master
+
+script: 
+  - mkdir -p build
+  - cd build
+  - cmake ..
+  - cmake --build .
