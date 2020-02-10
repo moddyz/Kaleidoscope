@@ -9,7 +9,7 @@ static double      s_numberValue     = 0.0;
 
 namespace kaleidoscope
 {
-int LexerNextToken()
+int GetNextToken()
 {
     static int lastChar = ' ';
 
@@ -50,7 +50,7 @@ int LexerNextToken()
         } while ( isdigit( lastChar ) || lastChar == '.' );
 
         s_numberValue = strtod( numberStr.c_str(), 0 );
-        return Token_Number;
+        return Token_Numeric;
     }
     else if ( lastChar == EOF )
     {
@@ -64,12 +64,12 @@ int LexerNextToken()
     }
 }
 
-const std::string& LexerGetIdentifierValue()
+const std::string& GetIdentifierValue()
 {
     return s_identifierValue;
 }
 
-double LexerGetNumberValue()
+double GetNumericValue()
 {
     return s_numberValue;
 }
