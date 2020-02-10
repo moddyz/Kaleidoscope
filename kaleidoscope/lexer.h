@@ -16,7 +16,7 @@ enum Token
 
     // Primary.
     Token_Identifier = -4,
-    Token_Numeric     = -5
+    Token_Numeric    = -5
 };
 
 /// Return the next Token from standard input.

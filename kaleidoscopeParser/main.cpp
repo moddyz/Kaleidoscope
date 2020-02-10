@@ -1,11 +1,24 @@
+#include <kaleidoscope/codeGenContext.h>
 #include <kaleidoscope/lexer.h>
 #include <kaleidoscope/parser.h>
 
+#include <llvm/IR/Function.h>
+#include <llvm/Support/raw_ostream.h>
+
+static kaleidoscope::CodeGenContext s_codeGenContext;
+
 void HandleDefinition()
 {
-    if ( kaleidoscope::ParseDefinitionExpr() )
+    auto expr = kaleidoscope::ParseDefinitionExpr();
+    if ( expr != nullptr )
     {
-        fprintf( stderr, "Parsed a function definition.\n" );
+        llvm::Value* value = expr->GenerateCode( s_codeGenContext );
+        if ( value != nullptr )
+        {
+            fprintf( stderr, "Parsed a function definition.\n" );
+            value->print( llvm::errs() );
+            fprintf( stderr, "\n" );
+        }
     }
     else
     {
@@ -16,9 +29,16 @@ void HandleDefinition()
 
 void HandleExtern()
 {
-    if ( kaleidoscope::ParseExternExpr() )
+    std::unique_ptr< kaleidoscope::PrototypeAST > expr = kaleidoscope::ParseExternExpr();
+    if ( expr != nullptr )
     {
-        fprintf( stderr, "Parsed an extern\n" );
+        llvm::Value* value = expr->GenerateCode( s_codeGenContext );
+        if ( value != nullptr )
+        {
+            fprintf( stderr, "Parsed an extern\n" );
+            value->print( llvm::errs() );
+            fprintf( stderr, "\n" );
+        }
     }
     else
     {
@@ -30,9 +50,16 @@ void HandleExtern()
 void HandleTopLevelExpression()
 {
     // Evaluate a top-level expression into an anonymous function.
-    if ( kaleidoscope::ParseTopLevelExpr() )
+    std::unique_ptr< kaleidoscope::FunctionAST > expr = kaleidoscope::ParseTopLevelExpr();
+    if ( expr != nullptr )
     {
-        fprintf( stderr, "Parsed a top-level expr\n" );
+        llvm::Value* value = expr->GenerateCode( s_codeGenContext );
+        if ( value != nullptr )
+        {
+            fprintf( stderr, "Parsed a top-level expr\n" );
+            value->print( llvm::errs() );
+            fprintf( stderr, "\n" );
+        }
     }
     else
     {

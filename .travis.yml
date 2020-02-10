@@ -13,14 +13,17 @@ jobs:
             - gcc-6
             - g++-6
             - cmake
+            - clang-9
       env: CXX=g++-6 CC=gcc-6
     - os: osx
       osx_image: xcode11.3
       compiler: clang
       addons:
-        packages:
-          - cmake
-        update: true
+        homebrew:
+          packages:
+            - cmake
+            - llvm@9
+          update: true
 
 install:
   - echo ${PATH}

@@ -13,10 +13,14 @@ install(
 
 # Library.
 file(GLOB SRC_FILES *.cpp)
-add_library(${PACKAGE_NAME} STATIC ${SRC_FILES})
+add_library(${PACKAGE_NAME} SHARED ${SRC_FILES})
 target_include_directories(
-    ${PACKAGE_NAME} PUBLIC ${CMAKE_BINARY_DIR}/include
+    ${PACKAGE_NAME} PUBLIC ${CMAKE_BINARY_DIR}/include ${LLVM_INCLUDES}
 )
+target_link_libraries(
+    ${PACKAGE_NAME} PUBLIC ${LLVM_LIBRARIES} ${LLVM_SYSTEM_LIBRARIES}
+)
+
 install(
     TARGETS ${PACKAGE_NAME}
     DESTINATION lib
