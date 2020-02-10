@@ -2,7 +2,7 @@
 
 /* Tools for parsing the kaleidoscope language into an AST (abstract syntax tree) */
 
-#include <kaleidoscope/AST.h>
+#include <kaleidoscope/ast.h>
 
 namespace kaleidoscope
 {

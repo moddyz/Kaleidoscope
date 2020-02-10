@@ -1,5 +1,5 @@
-#include <kaleidoscope/Lexer.h>
-#include <kaleidoscope/Parser.h>
+#include <kaleidoscope/lexer.h>
+#include <kaleidoscope/parser.h>
 
 void HandleDefinition()
 {
