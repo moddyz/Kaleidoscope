@@ -1,4 +1,4 @@
-set(PACKAGE_NAME "kaleidoscopeDriver")
+set(PACKAGE_NAME "kaleidoscopeParser")
 
 # Build executable
 file(GLOB SRC_FILES *.cpp)
