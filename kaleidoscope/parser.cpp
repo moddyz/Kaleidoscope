@@ -1,5 +1,6 @@
-#include <kaleidoscope/parser.h>
 #include <kaleidoscope/lexer.h>
+#include <kaleidoscope/logger.h>
+#include <kaleidoscope/parser.h>
 
 #include <map>
 
@@ -13,12 +14,6 @@ static int s_currentToken = 0;
 /// Binary operation precendence.
 /// An operator with higher number will be evaluated before one with a lower number.
 static std::map< char, int > s_binaryOperationPrecedence = {{'<', 10}, {'+', 20}, {'-', 20}, {'*', 20}};
-
-/// Error logging uilities.
-static void LogError( const char* i_errorMessage )
-{
-    fprintf( stderr, "Error: %s\n", i_errorMessage );
-}
 
 } // namespace
 

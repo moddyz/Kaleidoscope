@@ -10,8 +10,9 @@ Quick build:
 ./build.sh <INSTALLATION_PATH>
 ```
 
-Minimum Requirements:
+Requirements:
 - \>= CMake-3.10
+- \>= llvm-9.0.1
 
 ## Build Status
 

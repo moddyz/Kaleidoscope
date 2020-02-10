@@ -6,8 +6,17 @@
 #include <string>
 #include <vector>
 
+/// Forward declarations for LLVM types.
+namespace llvm
+{
+class Value;
+class Function;
+} // namespace llvm
+
 namespace kaleidoscope
 {
+class CodeGenContext;
+
 /// ExprAST is the base class for all expression nodes in the AST.
 class ExprAST
 {
@@ -15,6 +24,9 @@ public:
     virtual ~ExprAST()
     {
     }
+
+    /// Abstract method to generate code.
+    virtual llvm::Value* GenerateCode( CodeGenContext& io_context ) = 0;
 };
 
 /// NumericExprAST represents numeric literals, like "1.0".
@@ -25,6 +37,8 @@ public:
         : m_value( i_value )
     {
     }
+
+    virtual llvm::Value* GenerateCode( CodeGenContext& io_context ) override;
 
 private:
     /// Internal storage for numeric value.
@@ -40,6 +54,8 @@ public:
     {
     }
 
+    virtual llvm::Value* GenerateCode( CodeGenContext& io_context ) override;
+
 private:
     std::string m_name = ""; /// Internal storage for variable name.
 };
@@ -49,14 +65,14 @@ private:
 class BinaryExprAST : public ExprAST
 {
 public:
-    BinaryExprAST( char                       i_operation,
-                   std::unique_ptr< ExprAST > i_lhs,
-                   std::unique_ptr< ExprAST > i_rhs )
+    BinaryExprAST( char i_operation, std::unique_ptr< ExprAST > i_lhs, std::unique_ptr< ExprAST > i_rhs )
         : m_operation( i_operation )
         , m_lhs( std::move( i_lhs ) )
         , m_rhs( std::move( i_rhs ) )
     {
     }
+
+    virtual llvm::Value* GenerateCode( CodeGenContext& io_context ) override;
 
 private:
     char                       m_operation = ' ';     /// Type of operation.
@@ -69,12 +85,13 @@ private:
 class CallExprAST : public ExprAST
 {
 public:
-    CallExprAST( const std::string&                        i_callee,
-                 std::vector< std::unique_ptr< ExprAST > > i_arguments )
+    CallExprAST( const std::string& i_callee, std::vector< std::unique_ptr< ExprAST > > i_arguments )
         : m_callee( i_callee )
         , m_arguments( std::move( i_arguments ) )
     {
     }
+
+    virtual llvm::Value* GenerateCode( CodeGenContext& io_context ) override;
 
 private:
     std::string                               m_callee;    // Name of the function being called.
@@ -91,6 +108,12 @@ public:
     {
     }
 
+    /// Returns the function name.
+    const std::string& GetName() const;
+
+    /// Generate code for a function.
+    llvm::Function* GenerateCode( CodeGenContext& io_context );
+
 private:
     std::string                m_name;      /// Name of the function prototype.
     std::vector< std::string > m_arguments; /// Names of the arguments.
@@ -106,6 +129,9 @@ public:
         , m_body( std::move( i_body ) )
     {
     }
+
+    /// Generate code for a function.
+    llvm::Function* GenerateCode( CodeGenContext& io_context );
 
 private:
     std::unique_ptr< PrototypeAST > m_prototype; /// This function's associated prototype.
