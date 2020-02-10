@@ -1,4 +1,4 @@
-#include <kaleidoscope/Lexer.h>
+#include <kaleidoscope/lexer.h>
 
 namespace
 {

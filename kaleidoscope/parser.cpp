@@ -1,6 +1,5 @@
-#include <kaleidoscope/AST.h>
-#include <kaleidoscope/Lexer.h>
-#include <kaleidoscope/Parser.h>
+#include <kaleidoscope/parser.h>
+#include <kaleidoscope/lexer.h>
 
 #include <map>
 
