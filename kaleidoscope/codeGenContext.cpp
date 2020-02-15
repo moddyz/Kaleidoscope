@@ -1,11 +1,14 @@
 #include <kaleidoscope/codeGenContext.h>
+#include <llvm/Transforms/InstCombine/InstCombine.h>
 
 namespace kaleidoscope
 {
 CodeGenContext::CodeGenContext()
     : m_irBuilder( m_context )
     , m_module( "MyModule", m_context )
+    , m_passManager( &m_module )
 {
+    m_passManager.add( llvm::createInstructionCombiningPass() );
 }
 
 void CodeGenContext::Print()
