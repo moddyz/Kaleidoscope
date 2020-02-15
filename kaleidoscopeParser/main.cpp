@@ -5,14 +5,16 @@
 #include <llvm/IR/Function.h>
 #include <llvm/Support/raw_ostream.h>
 
-static kaleidoscope::CodeGenContext s_codeGenContext;
+#include <iostream>
 
-void HandleDefinition()
+using namespace kaleidoscope;
+
+void HandleDefinition( Parser& io_parser, CodeGenContext& io_codeGenContext )
 {
-    auto expr = kaleidoscope::ParseDefinitionExpr();
+    auto expr = io_parser.ParseDefinitionExpr();
     if ( expr != nullptr )
     {
-        llvm::Value* value = expr->GenerateCode( s_codeGenContext );
+        llvm::Value* value = expr->GenerateCode( io_codeGenContext );
         if ( value != nullptr )
         {
             fprintf( stderr, "Parsed a function definition.\n" );
@@ -23,16 +25,16 @@ void HandleDefinition()
     else
     {
         // Skip token for error recovery.
-        kaleidoscope::ParseNextToken();
+        io_parser.ParseNextToken();
     }
 }
 
-void HandleExtern()
+void HandleExtern( Parser& io_parser, CodeGenContext& io_codeGenContext )
 {
-    std::unique_ptr< kaleidoscope::PrototypeAST > expr = kaleidoscope::ParseExternExpr();
+    std::unique_ptr< PrototypeAST > expr = io_parser.ParseExternExpr();
     if ( expr != nullptr )
     {
-        llvm::Value* value = expr->GenerateCode( s_codeGenContext );
+        llvm::Value* value = expr->GenerateCode( io_codeGenContext );
         if ( value != nullptr )
         {
             fprintf( stderr, "Parsed an extern\n" );
@@ -43,17 +45,17 @@ void HandleExtern()
     else
     {
         // Skip token for error recovery.
-        kaleidoscope::ParseNextToken();
+        io_parser.ParseNextToken();
     }
 }
 
-void HandleTopLevelExpression()
+void HandleTopLevelExpression( Parser& io_parser, CodeGenContext& io_codeGenContext )
 {
     // Evaluate a top-level expression into an anonymous function.
-    std::unique_ptr< kaleidoscope::FunctionAST > expr = kaleidoscope::ParseTopLevelExpr();
+    std::unique_ptr< FunctionAST > expr = io_parser.ParseTopLevelExpr();
     if ( expr != nullptr )
     {
-        llvm::Value* value = expr->GenerateCode( s_codeGenContext );
+        llvm::Value* value = expr->GenerateCode( io_codeGenContext );
         if ( value != nullptr )
         {
             fprintf( stderr, "Parsed a top-level expr\n" );
@@ -64,30 +66,34 @@ void HandleTopLevelExpression()
     else
     {
         // Skip token for error recovery.
-        kaleidoscope::ParseNextToken();
+        io_parser.ParseNextToken();
     }
 }
 
 void MainLoop()
 {
-    while ( true )
+    CodeGenContext codeGenContext;
+
+    std::string line;
+    while ( std::getline( std::cin, line ) )
     {
         fprintf( stderr, "ready> " );
-        switch ( kaleidoscope::ParseCurrentToken() )
+        Parser parser( line );
+        switch ( parser.ParseCurrentToken() )
         {
-        case kaleidoscope::Token_Eof:
-            return;
+        case Token_Eof:
+            break;
         case ';': // ignore top-level semicolons.
-            kaleidoscope::ParseNextToken();
+            parser.ParseNextToken();
             break;
-        case kaleidoscope::Token_Def:
-            HandleDefinition();
+        case Token_Def:
+            HandleDefinition( parser, codeGenContext );
             break;
-        case kaleidoscope::Token_Extern:
-            HandleExtern();
+        case Token_Extern:
+            HandleExtern( parser, codeGenContext );
             break;
         default:
-            HandleTopLevelExpression();
+            HandleTopLevelExpression( parser, codeGenContext );
             break;
         }
     }
@@ -96,7 +102,6 @@ void MainLoop()
 int main()
 {
     fprintf( stderr, "ready> " );
-    kaleidoscope::ParseNextToken();
     MainLoop();
     return 0;
 }
