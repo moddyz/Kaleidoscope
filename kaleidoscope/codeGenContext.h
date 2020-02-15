@@ -2,11 +2,13 @@
 
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/LegacyPassManager.h>
 
 namespace kaleidoscope
 {
 /// CodeGenContext is a structure storing the internal state
-/// for the course of a code generation session.
+/// of the generated IR code, and various LLVM objects which
+/// contribute to code-generation.
 class CodeGenContext
 {
 public:
@@ -28,14 +30,10 @@ public:
     std::map< std::string, llvm::Value* >& GetNamedValuesInScope();
 
 private:
-    /// Storage of llvm internals.
-    llvm::LLVMContext m_context;
-
-    /// Helper object for generating instructions.
-    llvm::IRBuilder<> m_irBuilder;
-
-    /// Top-level container for functions and global variables.  Owns all memory for generated IR.
-    llvm::Module m_module;
+    llvm::LLVMContext                 m_context;     /// Storage of LLVM internals.
+    llvm::IRBuilder<>                 m_irBuilder;   /// Helper object for generating instructions.
+    llvm::Module                      m_module;      /// Top-level container for functions and global variables.
+    llvm::legacy::FunctionPassManager m_passManager; /// Manager all the optimization passes.
 
     /// Keeps track of values defined in the scope, mapped to their IR.
     /// Currently, only function parameters are referencable.
