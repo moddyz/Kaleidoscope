@@ -11,7 +11,7 @@ void LogError( const char* i_errorMessage, ... )
     va_start( args, i_errorMessage );
     vsnprintf( buffer, bufferSize, i_errorMessage, args );
     va_end( args );
-    fprintf( stderr, "Error: %s\n", i_errorMessage );
+    fprintf( stderr, "Error: %s\n", buffer );
 }
 
 } // namespace kaleidoscope

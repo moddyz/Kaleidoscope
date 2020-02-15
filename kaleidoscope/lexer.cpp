@@ -1,77 +1,89 @@
 #include <kaleidoscope/lexer.h>
+#include <kaleidoscope/logger.h>
 
 namespace
 {
 /// Static storage of different types of token values.
-static std::string s_identifierValue = "";
-static double      s_numberValue     = 0.0;
 } // namespace
 
 namespace kaleidoscope
 {
-int GetNextToken()
+Lexer::Lexer( const std::string& i_text )
+    : m_text( i_text )
 {
-    static int lastChar = ' ';
+}
 
+int Lexer::GetNextToken()
+{
     // Skip all whitespace characters.
-    while ( isspace( lastChar ) )
+    while ( isspace( m_lastChar ) )
     {
-        lastChar = getchar();
+        m_lastChar = getChar();
     }
 
-    if ( isalpha( lastChar ) )
+    if ( isalpha( m_lastChar ) )
     {
         // Handle non-numerical tokens.
-        s_identifierValue = lastChar;
-        while ( isalnum( lastChar = getchar() ) )
+        m_identifierValue = m_lastChar;
+        while ( isalnum( m_lastChar = getChar() ) )
         {
-            s_identifierValue += lastChar;
+            m_identifierValue += m_lastChar;
         }
 
-        if ( s_identifierValue == "def" )
+        if ( m_identifierValue == "def" )
         {
             return Token_Def;
         }
-        else if ( s_identifierValue == "extern" )
+        else if ( m_identifierValue == "extern" )
         {
             return Token_Extern;
         }
 
         return Token_Identifier;
     }
-    else if ( isdigit( lastChar ) || lastChar == '.' )
+    else if ( isdigit( m_lastChar ) || m_lastChar == '.' )
     {
         // Handle numerical double-precision tokens.
         std::string numberStr;
         do
         {
-            numberStr += lastChar;
-            lastChar = getchar();
-        } while ( isdigit( lastChar ) || lastChar == '.' );
+            numberStr += m_lastChar;
+            m_lastChar = getChar();
+        } while ( isdigit( m_lastChar ) || m_lastChar == '.' );
 
-        s_numberValue = strtod( numberStr.c_str(), 0 );
+        m_numberValue = strtod( numberStr.c_str(), 0 );
         return Token_Numeric;
     }
-    else if ( lastChar == EOF )
+    else if ( m_lastChar == EOF )
     {
         return Token_Eof;
     }
     else
     {
-        int thisCharInt = ( int ) lastChar;
-        lastChar        = getchar();
+        int thisCharInt = ( int ) m_lastChar;
+        m_lastChar      = getChar();
         return thisCharInt;
     }
 }
 
-const std::string& GetIdentifierValue()
+const std::string& Lexer::GetIdentifierValue()
 {
-    return s_identifierValue;
+    return m_identifierValue;
 }
 
-double GetNumericValue()
+double Lexer::GetNumericValue()
 {
-    return s_numberValue;
+    return m_numberValue;
+}
+
+char Lexer::getChar()
+{
+    if ( m_position >= m_text.size() )
+    {
+        return EOF;
+    }
+
+    return m_text.at( m_position++ );
 }
 
 } // namespace kaleidoscope
