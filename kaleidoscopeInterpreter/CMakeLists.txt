@@ -1,4 +1,4 @@
-set(PACKAGE_NAME "kaleidoscopeParser")
+set(PACKAGE_NAME "kaleidoscopeInterpreter")
 
 # Build executable
 file(GLOB SRC_FILES *.cpp)
