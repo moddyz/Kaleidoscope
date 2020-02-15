@@ -11,7 +11,7 @@ using namespace kaleidoscope;
 
 void HandleDefinition( Parser& io_parser, CodeGenContext& io_codeGenContext )
 {
-    auto expr = io_parser.ParseDefinitionExpr();
+    std::unique_ptr< FunctionAST > expr = io_parser.ParseDefinitionExpr();
     if ( expr != nullptr )
     {
         llvm::Value* value = expr->GenerateCode( io_codeGenContext );
