@@ -74,10 +74,10 @@ void MainLoop()
 {
     CodeGenContext codeGenContext;
 
+    fprintf( stderr, "kaleidoscope> " );
     std::string line;
     while ( std::getline( std::cin, line ) )
     {
-        fprintf( stderr, "ready> " );
         Parser parser( line );
         switch ( parser.ParseCurrentToken() )
         {
@@ -96,12 +96,13 @@ void MainLoop()
             HandleTopLevelExpression( parser, codeGenContext );
             break;
         }
+
+        fprintf( stderr, "kaleidoscope> " );
     }
 }
 
 int main()
 {
-    fprintf( stderr, "ready> " );
     MainLoop();
     return 0;
 }
