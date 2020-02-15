@@ -105,7 +105,7 @@ llvm::Function* PrototypeAST::GenerateCode( CodeGenContext& io_context )
 
     // Create new IR Function in our modulefrom functionType.
     llvm::Function* function =
-        llvm::Function::Create( functionType, llvm::Function::ExternalLinkage, llvm::Twine( m_name ), io_context.GetLLVMModule() );
+        llvm::Function::Create( functionType, llvm::Function::ExternalLinkage, llvm::Twine( m_name ), &io_context.GetLLVMModule() );
 
     // Set argument names to make IR more readable.
     size_t argIndex = 0;
