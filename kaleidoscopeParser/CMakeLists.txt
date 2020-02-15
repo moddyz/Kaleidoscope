@@ -10,10 +10,6 @@ target_link_libraries(
     ${PACKAGE_NAME} PUBLIC kaleidoscope
 )
 
-if(UNIX AND NOT APPLE)
-    set(LINUX TRUE)
-endif()
-
 if (LINUX)
     set_target_properties(${PACKAGE_NAME} PROPERTIES LINK_FLAGS "-Wl,-rpath,$ORIGIN/../lib/")
 endif()
