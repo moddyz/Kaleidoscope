@@ -12,7 +12,7 @@ Quick build:
 
 Requirements:
 - \>= CMake-3.10
-- \>= llvm-9.0.1
+- \>= llvm-7.0.0
 
 ## Build Status
 
