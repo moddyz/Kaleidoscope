@@ -26,4 +26,4 @@ add_compile_options(-g -O3 -Werror)
 
 # Build kaleidoscope targets.
 add_subdirectory(kaleidoscope)
-add_subdirectory(kaleidoscopeParser)
+add_subdirectory(kaleidoscopeInterpreter)
