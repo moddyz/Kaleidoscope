@@ -163,6 +163,7 @@ llvm::Function* FunctionAST::GenerateCode( CodeGenContext& io_context )
     {
         io_context.GetIRBuilder().CreateRet( returnValue );
         llvm::verifyFunction( *function );
+        io_context.GetFunctionPassManager().run( *function );
         return function;
     }
     else
