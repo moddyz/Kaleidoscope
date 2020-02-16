@@ -3,8 +3,8 @@
 #include <kaleidoscope/logger.h>
 #include <kaleidoscope/parser.h>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 using namespace kaleidoscope;
 
@@ -63,10 +63,15 @@ int main( int i_argc, char** i_argv )
     }
 
     CodeGenContext codeGenContext;
-    std::string    line;
-    while ( std::getline( fileStream, line ) )
+    std::string    lineString;
+    size_t         lineNumber = 0;
+    LogInfo( "Compiling '%s'...", sourceFile.c_str() );
+    while ( std::getline( fileStream, lineString ) )
     {
-        Parser parser( line );
+        LogInfo( "%s", lineString.c_str() );
+
+        // Depending on token,
+        Parser parser( lineString );
         switch ( parser.ParseCurrentToken() )
         {
         case Token_Eof:
@@ -86,7 +91,7 @@ int main( int i_argc, char** i_argv )
         }
     }
 
-    printf( "Successfully compiled '%s, generated IR:'\n", sourceFile.c_str() );
+    LogInfo( "Successfully compiled '%s', generated IR:", sourceFile.c_str() );
     codeGenContext.Print();
 
     return 0;
