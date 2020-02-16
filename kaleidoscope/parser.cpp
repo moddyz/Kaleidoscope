@@ -305,7 +305,7 @@ std::unique_ptr< FunctionAST > Parser::ParseTopLevelExpr()
 
     // Create an anonymous function prototype, with no arguments to construct our function expression.
     std::unique_ptr< PrototypeAST > prototypeExpr =
-        std::make_unique< PrototypeAST >( "", std::vector< std::string >() );
+        std::make_unique< PrototypeAST >( "__anon_expr", std::vector< std::string >() );
     return std::make_unique< FunctionAST >( std::move( prototypeExpr ), std::move( expression ) );
 }
 
