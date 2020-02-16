@@ -61,7 +61,7 @@ llvm::Value* BinaryExprAST::GenerateCode( CodeGenContext& io_context )
 llvm::Value* CallExprAST::GenerateCode( CodeGenContext& io_context )
 {
     // Look up function name in global module table.
-    llvm::Function* calleeFunc = io_context.GetLLVMModule().getFunction( m_callee );
+    llvm::Function* calleeFunc = io_context.GetModule()->getFunction( m_callee );
     if ( calleeFunc == nullptr )
     {
         LogError( "Unknown function '%s' referenced.", m_callee.c_str() );
@@ -107,7 +107,7 @@ llvm::Function* PrototypeAST::GenerateCode( CodeGenContext& io_context )
     llvm::Function* function = llvm::Function::Create( functionType,
                                                        llvm::Function::ExternalLinkage,
                                                        llvm::Twine( m_name ),
-                                                       &io_context.GetLLVMModule() );
+                                                       io_context.GetModule() );
 
     // Set argument names to make IR more readable.
     size_t argIndex = 0;
@@ -123,7 +123,7 @@ llvm::Function* PrototypeAST::GenerateCode( CodeGenContext& io_context )
 llvm::Function* FunctionAST::GenerateCode( CodeGenContext& io_context )
 {
     // Check for existing function generated from previous 'extern' declaration.
-    llvm::Function* function = io_context.GetLLVMModule().getFunction( m_prototype->GetName() );
+    llvm::Function* function = io_context.GetModule()->getFunction( m_prototype->GetName() );
 
     // Function has not been previously declared, create one from prototype.
     if ( function == nullptr )
@@ -163,7 +163,7 @@ llvm::Function* FunctionAST::GenerateCode( CodeGenContext& io_context )
     {
         io_context.GetIRBuilder().CreateRet( returnValue );
         llvm::verifyFunction( *function );
-        io_context.GetFunctionPassManager().run( *function );
+        io_context.GetFunctionPassManager()->run( *function );
         return function;
     }
     else

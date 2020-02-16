@@ -1,13 +1,17 @@
+#include <kaleidoscope/KaleidoscopeJIT.h>
 #include <kaleidoscope/codeGenContext.h>
 #include <kaleidoscope/lexer.h>
 #include <kaleidoscope/parser.h>
 
 #include <llvm/IR/Function.h>
+#include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/raw_ostream.h>
 
 #include <iostream>
 
 using namespace kaleidoscope;
+
+typedef double ( *GetDoubleFn )();
 
 void HandleDefinition( Parser& io_parser, CodeGenContext& io_codeGenContext )
 {
@@ -49,7 +53,9 @@ void HandleExtern( Parser& io_parser, CodeGenContext& io_codeGenContext )
     }
 }
 
-void HandleTopLevelExpression( Parser& io_parser, CodeGenContext& io_codeGenContext )
+void HandleTopLevelExpression( Parser&                     io_parser,
+                               CodeGenContext&             io_codeGenContext,
+                               llvm::orc::KaleidoscopeJIT& io_jit )
 {
     // Evaluate a top-level expression into an anonymous function.
     std::unique_ptr< FunctionAST > expr = io_parser.ParseTopLevelExpr();
@@ -58,9 +64,25 @@ void HandleTopLevelExpression( Parser& io_parser, CodeGenContext& io_codeGenCont
         llvm::Value* value = expr->GenerateCode( io_codeGenContext );
         if ( value != nullptr )
         {
-            fprintf( stderr, "Parsed a top-level expr\n" );
-            value->print( llvm::errs() );
-            fprintf( stderr, "\n" );
+            // JIT compile the module.
+            llvm::orc::VModuleKey moduleKey = io_jit.addModule( std::move( io_codeGenContext.MoveModule() ) );
+            io_codeGenContext.InitializeModuleWithJIT( io_jit );
+
+            // Find anonymous symbol
+            llvm::JITSymbol exprSymbol = io_jit.findSymbol( "__anon_expr" );
+            assert( exprSymbol );
+
+            // Get the expression's symbol address, and cast it to a function ptr which
+            // takes no arguments and returns a double on invocation.
+            llvm::Expected< uintptr_t > addr = exprSymbol.getAddress();
+            assert( addr );
+            GetDoubleFn functionPtr = ( GetDoubleFn )( uintptr_t ) addr.get();
+
+            // Evaluate function ptr.
+            fprintf( stderr, "Evaluated to %f\n", functionPtr() );
+
+            // Delete module from jit.
+            io_jit.removeModule( moduleKey );
         }
     }
     else
@@ -72,7 +94,14 @@ void HandleTopLevelExpression( Parser& io_parser, CodeGenContext& io_codeGenCont
 
 void MainLoop()
 {
+    llvm::InitializeNativeTarget();
+    llvm::InitializeNativeTargetAsmPrinter();
+    llvm::InitializeNativeTargetAsmParser();
+
     CodeGenContext codeGenContext;
+
+    llvm::orc::KaleidoscopeJIT jit;
+    codeGenContext.InitializeModuleWithJIT( jit );
 
     fprintf( stderr, "kaleidoscope> " );
     std::string line;
@@ -93,7 +122,7 @@ void MainLoop()
             HandleExtern( parser, codeGenContext );
             break;
         default:
-            HandleTopLevelExpression( parser, codeGenContext );
+            HandleTopLevelExpression( parser, codeGenContext, jit );
             break;
         }
 

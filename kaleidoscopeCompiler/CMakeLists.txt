@@ -4,10 +4,10 @@ set(PACKAGE_NAME "kaleidoscopeCompiler")
 file(GLOB SRC_FILES *.cpp)
 add_executable(${PACKAGE_NAME} ${SRC_FILES})
 target_include_directories(
-    ${PACKAGE_NAME} PUBLIC ${CMAKE_BINARY_DIR}/include
+    ${PACKAGE_NAME} PRIVATE ${CMAKE_BINARY_DIR}/include
 )
 target_link_libraries(
-    ${PACKAGE_NAME} PUBLIC kaleidoscope
+    ${PACKAGE_NAME} PRIVATE kaleidoscope
 )
 
 if (LINUX)
