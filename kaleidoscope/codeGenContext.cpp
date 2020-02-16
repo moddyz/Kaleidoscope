@@ -1,5 +1,7 @@
 #include <kaleidoscope/codeGenContext.h>
 #include <llvm/Transforms/InstCombine/InstCombine.h>
+#include <llvm/Transforms/Scalar.h>
+#include <llvm/Transforms/Scalar/GVN.h>
 
 namespace kaleidoscope
 {
@@ -9,6 +11,10 @@ CodeGenContext::CodeGenContext()
     , m_passManager( &m_module )
 {
     m_passManager.add( llvm::createInstructionCombiningPass() );
+    m_passManager.add( llvm::createReassociatePass() );
+    m_passManager.add( llvm::createGVNPass() );
+    m_passManager.add( llvm::createCFGSimplificationPass() );
+    m_passManager.doInitialization();
 }
 
 void CodeGenContext::Print()
@@ -34,6 +40,11 @@ llvm::IRBuilder<>& CodeGenContext::GetIRBuilder()
 std::map< std::string, llvm::Value* >& CodeGenContext::GetNamedValuesInScope()
 {
     return m_namedValuesInScope;
+}
+
+llvm::legacy::FunctionPassManager& CodeGenContext::GetFunctionPassManager()
+{
+    return m_passManager;
 }
 
 } // namespace kaleidoscope

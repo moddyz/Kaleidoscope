@@ -29,6 +29,9 @@ public:
     /// Get all the named values in scope.
     std::map< std::string, llvm::Value* >& GetNamedValuesInScope();
 
+    /// Get the function pass manager.
+    llvm::legacy::FunctionPassManager& GetFunctionPassManager();
+
 private:
     llvm::LLVMContext                 m_context;     /// Storage of LLVM internals.
     llvm::IRBuilder<>                 m_irBuilder;   /// Helper object for generating instructions.
