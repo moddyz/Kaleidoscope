@@ -36,7 +36,7 @@ int Parser::ParseNextToken()
 
 /// Parse the current numeric expression.
 /// \return the parsed numeric AST expression.
-std::unique_ptr< ExprAST > Parser::ParseNumericExpr()
+std::unique_ptr< ExprAST > Parser::parseNumericExpr()
 {
     std::unique_ptr< NumericExprAST > numeric = std::make_unique< NumericExprAST >( m_lexer.GetNumericValue() );
     ParseNextToken();
@@ -45,12 +45,12 @@ std::unique_ptr< ExprAST > Parser::ParseNumericExpr()
 
 /// Parse the current parenthesis expression.
 /// \return the parsed expression within the parenthesis.
-std::unique_ptr< ExprAST > Parser::ParseParenthesisExpr()
+std::unique_ptr< ExprAST > Parser::parseParenthesisExpr()
 {
     // Consume '('
     ParseNextToken();
 
-    std::unique_ptr< ExprAST > expr = ParseExpr();
+    std::unique_ptr< ExprAST > expr = parseExpr();
     if ( expr == nullptr )
     {
         return nullptr;
@@ -70,7 +70,7 @@ std::unique_ptr< ExprAST > Parser::ParseParenthesisExpr()
 
 /// Parse the current identifier expression.
 /// \return the parsed identifier expression.
-std::unique_ptr< ExprAST > Parser::ParseIdentifierExpr()
+std::unique_ptr< ExprAST > Parser::parseIdentifierExpr()
 {
     std::string identifier = m_lexer.GetIdentifierValue();
 
@@ -94,7 +94,7 @@ std::unique_ptr< ExprAST > Parser::ParseIdentifierExpr()
     {
         while ( true )
         {
-            std::unique_ptr< ExprAST > expression = ParseExpr();
+            std::unique_ptr< ExprAST > expression = parseExpr();
             if ( expression != nullptr )
             {
                 arguments.push_back( std::move( expression ) );
@@ -127,17 +127,17 @@ std::unique_ptr< ExprAST > Parser::ParseIdentifierExpr()
 }
 
 /// Entry point for parsing a primary expression (identifier, numeric, or parenthensis)
-std::unique_ptr< ExprAST > Parser::ParsePrimaryExpr()
+std::unique_ptr< ExprAST > Parser::parsePrimaryExpr()
 {
     int token = ParseCurrentToken();
     switch ( token )
     {
     case Token_Identifier:
-        return ParseIdentifierExpr();
+        return parseIdentifierExpr();
     case Token_Numeric:
-        return ParseNumericExpr();
+        return parseNumericExpr();
     case '(':
-        return ParseParenthesisExpr();
+        return parseParenthesisExpr();
     default:
         LogError( "unknown token when expecting an expression: %c", token );
         return nullptr;
@@ -148,7 +148,7 @@ std::unique_ptr< ExprAST > Parser::ParsePrimaryExpr()
 //
 /// \returns -1 if the current token is not a binary operator.  Otherwise the precendence of the current binrary
 /// operator token will be returned.
-int Parser::ParseCurrentTokenPrecendence()
+int Parser::parseCurrentTokenPrecendence()
 {
     if ( !isascii( ParseCurrentToken() ) )
     {
@@ -166,11 +166,11 @@ int Parser::ParseCurrentTokenPrecendence()
 
 /// Parses the RHS operand of a binary expression.
 /// \returns parsed RHS operand expression.
-std::unique_ptr< ExprAST > Parser::ParseBinaryOperatorRHS( int i_precendence, std::unique_ptr< ExprAST > io_lhs )
+std::unique_ptr< ExprAST > Parser::parseBinaryOperatorRHS( int i_precendence, std::unique_ptr< ExprAST > io_lhs )
 {
     while ( true )
     {
-        int leftPrecedence = ParseCurrentTokenPrecendence();
+        int leftPrecedence = parseCurrentTokenPrecendence();
         if ( i_precendence > leftPrecedence )
         {
             return io_lhs;
@@ -182,13 +182,13 @@ std::unique_ptr< ExprAST > Parser::ParseBinaryOperatorRHS( int i_precendence, st
         ParseNextToken();
 
         // Parse RHS
-        std::unique_ptr< ExprAST > rhs = ParsePrimaryExpr();
+        std::unique_ptr< ExprAST > rhs = parsePrimaryExpr();
         if ( rhs == nullptr )
         {
             return nullptr;
         }
 
-        int rightPrecedence = ParseCurrentTokenPrecendence();
+        int rightPrecedence = parseCurrentTokenPrecendence();
         if ( leftPrecedence < rightPrecedence )
         {
             // Right binary operator takes precedence.
@@ -197,7 +197,7 @@ std::unique_ptr< ExprAST > Parser::ParseBinaryOperatorRHS( int i_precendence, st
             // The reasoning for leftPrecedence + 1 is so that binary operations
             // expressions are consumed *up until* we reach a binary operation with
             // same or less precedence as the current 'left' binary operation.
-            rhs = ParseBinaryOperatorRHS( leftPrecedence + 1, std::move( rhs ) );
+            rhs = parseBinaryOperatorRHS( leftPrecedence + 1, std::move( rhs ) );
         }
 
         // Merge LHS / RHS with left binary operator to form one a binary expression.
@@ -209,20 +209,20 @@ std::unique_ptr< ExprAST > Parser::ParseBinaryOperatorRHS( int i_precendence, st
 
 /// Parses a potential binary expression.
 /// \returns parsed binary expression.
-std::unique_ptr< ExprAST > Parser::ParseExpr()
+std::unique_ptr< ExprAST > Parser::parseExpr()
 {
-    std::unique_ptr< ExprAST > lhs = ParsePrimaryExpr();
+    std::unique_ptr< ExprAST > lhs = parsePrimaryExpr();
     if ( lhs == nullptr )
     {
         return nullptr;
     }
 
-    return ParseBinaryOperatorRHS( 0, std::move( lhs ) );
+    return parseBinaryOperatorRHS( 0, std::move( lhs ) );
 }
 
 /// Parses a function prototype.
 /// \returns parsed function prototype.
-std::unique_ptr< PrototypeAST > Parser::ParsePrototypeExpr()
+std::unique_ptr< PrototypeAST > Parser::parsePrototypeExpr()
 {
     if ( ParseCurrentToken() != Token_Identifier )
     {
@@ -265,14 +265,14 @@ std::unique_ptr< FunctionAST > Parser::ParseDefinitionExpr()
     ParseNextToken();
 
     // Parse function prototype.
-    std::unique_ptr< PrototypeAST > prototypeExpr = ParsePrototypeExpr();
+    std::unique_ptr< PrototypeAST > prototypeExpr = parsePrototypeExpr();
     if ( prototypeExpr == nullptr )
     {
         return nullptr;
     }
 
     // Parse potential binary operation expression in function definintion.
-    std::unique_ptr< ExprAST > definitionExpr = ParseExpr();
+    std::unique_ptr< ExprAST > definitionExpr = parseExpr();
     if ( definitionExpr == nullptr )
     {
         return nullptr;
@@ -292,12 +292,12 @@ std::unique_ptr< PrototypeAST > Parser::ParseExternExpr()
     // Consume 'extern'.
     ParseNextToken();
 
-    return ParsePrototypeExpr();
+    return parsePrototypeExpr();
 }
 
 std::unique_ptr< FunctionAST > Parser::ParseTopLevelExpr()
 {
-    std::unique_ptr< ExprAST > expression = ParseExpr();
+    std::unique_ptr< ExprAST > expression = parseExpr();
     if ( expression == nullptr )
     {
         return nullptr;
