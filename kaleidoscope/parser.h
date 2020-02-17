@@ -10,26 +10,32 @@ namespace kaleidoscope
 class Parser
 {
 public:
+    KALEIDOSCOPE_API
     explicit Parser( const std::string& i_text );
 
     /// Get the current token.
     /// \return current token.
+    KALEIDOSCOPE_API
     int ParseCurrentToken();
 
     /// Parse the next token into the current buffer.
     /// \return previously stored token.
+    KALEIDOSCOPE_API
     int ParseNextToken();
 
     /// Parse an 'extern' function declaration, with no body (basically a prototype).
     /// \returns function prototype expression.
+    KALEIDOSCOPE_API
     std::unique_ptr< PrototypeAST > ParseExternExpr();
 
     /// Parses a function definition.
     /// \returns parsed function definition.
+    KALEIDOSCOPE_API
     std::unique_ptr< FunctionAST > ParseDefinitionExpr();
 
     /// Parse a top-level expression which is evaluated on the fly.
     /// \returns function exprssion.
+    KALEIDOSCOPE_API
     std::unique_ptr< FunctionAST > ParseTopLevelExpr();
 
 private:

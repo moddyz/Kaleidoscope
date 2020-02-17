@@ -1,5 +1,7 @@
 #pragma once
 
+#include <kaleidoscope/api.h>
+
 #include <string>
 
 namespace kaleidoscope
@@ -25,15 +27,19 @@ class Lexer
 {
 public:
     /// Ctor.
+    KALEIDOSCOPE_API
     explicit Lexer( const std::string& i_text );
 
     /// Get the next token.
+    KALEIDOSCOPE_API
     int GetNextToken();
 
     /// Get the value of the last Identifier token.
+    KALEIDOSCOPE_API
     const std::string& GetIdentifierValue();
 
     /// Get the value of the last Numeric token.
+    KALEIDOSCOPE_API
     double GetNumericValue();
 
 private:

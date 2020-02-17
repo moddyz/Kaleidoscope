@@ -2,6 +2,8 @@
 
 /* AST (Abstract Syntax Tree) nodes describing the constructs of the Kaleidoscope language */
 
+#include <kaleidoscope/api.h>
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -21,11 +23,13 @@ class CodeGenContext;
 class ExprAST
 {
 public:
+    KALEIDOSCOPE_API
     virtual ~ExprAST()
     {
     }
 
     /// Abstract method to generate code.
+    KALEIDOSCOPE_API
     virtual llvm::Value* GenerateCode( CodeGenContext& io_context ) = 0;
 };
 
@@ -33,11 +37,13 @@ public:
 class NumericExprAST : public ExprAST
 {
 public:
+    KALEIDOSCOPE_API
     NumericExprAST( double i_value )
         : m_value( i_value )
     {
     }
 
+    KALEIDOSCOPE_API
     virtual llvm::Value* GenerateCode( CodeGenContext& io_context ) override;
 
 private:
@@ -49,11 +55,13 @@ private:
 class VariableExprAST : public ExprAST
 {
 public:
+    KALEIDOSCOPE_API
     VariableExprAST( const std::string& i_name )
         : m_name( i_name )
     {
     }
 
+    KALEIDOSCOPE_API
     virtual llvm::Value* GenerateCode( CodeGenContext& io_context ) override;
 
 private:
@@ -65,6 +73,7 @@ private:
 class BinaryExprAST : public ExprAST
 {
 public:
+    KALEIDOSCOPE_API
     BinaryExprAST( char i_operation, std::unique_ptr< ExprAST > i_lhs, std::unique_ptr< ExprAST > i_rhs )
         : m_operation( i_operation )
         , m_lhs( std::move( i_lhs ) )
@@ -72,6 +81,7 @@ public:
     {
     }
 
+    KALEIDOSCOPE_API
     virtual llvm::Value* GenerateCode( CodeGenContext& io_context ) override;
 
 private:
@@ -85,12 +95,14 @@ private:
 class CallExprAST : public ExprAST
 {
 public:
+    KALEIDOSCOPE_API
     CallExprAST( const std::string& i_callee, std::vector< std::unique_ptr< ExprAST > > i_arguments )
         : m_callee( i_callee )
         , m_arguments( std::move( i_arguments ) )
     {
     }
 
+    KALEIDOSCOPE_API
     virtual llvm::Value* GenerateCode( CodeGenContext& io_context ) override;
 
 private:
@@ -102,6 +114,7 @@ private:
 class PrototypeAST
 {
 public:
+    KALEIDOSCOPE_API
     PrototypeAST( const std::string& i_name, const std::vector< std::string >& i_arguments )
         : m_name( i_name )
         , m_arguments( i_arguments )
@@ -109,9 +122,11 @@ public:
     }
 
     /// Returns the function name.
+    KALEIDOSCOPE_API
     const std::string& GetName() const;
 
     /// Generate code for a function.
+    KALEIDOSCOPE_API
     llvm::Function* GenerateCode( CodeGenContext& io_context );
 
 private:
@@ -124,6 +139,7 @@ private:
 class FunctionAST
 {
 public:
+    KALEIDOSCOPE_API
     FunctionAST( std::unique_ptr< PrototypeAST > i_prototype, std::unique_ptr< ExprAST > i_body )
         : m_prototype( std::move( i_prototype ) )
         , m_body( std::move( i_body ) )
@@ -131,6 +147,7 @@ public:
     }
 
     /// Generate code for a function.
+    KALEIDOSCOPE_API
     llvm::Function* GenerateCode( CodeGenContext& io_context );
 
 private:

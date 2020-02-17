@@ -1,5 +1,7 @@
 #pragma once
 
+#include <kaleidoscope/api.h>
+
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/LegacyPassManager.h>
@@ -35,39 +37,50 @@ class PrototypeAST;
 class CodeGenContext
 {
 public:
+    KALEIDOSCOPE_API
     CodeGenContext();
 
     /// Print out the generated IR code described in the module thus far.
+    KALEIDOSCOPE_API
     void Print();
 
     /// Get the LLVM context.
+    KALEIDOSCOPE_API
     llvm::LLVMContext& GetLLVMContext();
 
     /// Get the LLVM IR Builder.
+    KALEIDOSCOPE_API
     llvm::IRBuilder<>& GetIRBuilder();
 
     /// Initialize the module.
+    KALEIDOSCOPE_API
     void InitializeModule();
 
     /// Initialize the module with data layout based on JIT.
+    KALEIDOSCOPE_API
     void InitializeModuleWithJIT( llvm::orc::KaleidoscopeJIT& io_jit );
 
     /// Get the LLVM module as a raw ptr.
+    KALEIDOSCOPE_API
     llvm::Module* GetModule();
 
     /// Move the LLVM module as a unique ptr, transfering ownership to an external entity.
+    KALEIDOSCOPE_API
     std::unique_ptr< llvm::Module > MoveModule();
 
     /// Get all the named values in scope.
+    KALEIDOSCOPE_API
     std::map< std::string, llvm::Value* >& GetNamedValuesInScope();
 
     /// Get the function pass manager.
+    KALEIDOSCOPE_API
     llvm::legacy::FunctionPassManager* GetFunctionPassManager();
 
     /// Generate code from an existing function prototype
     llvm::Function* GetFunction( const std::string& i_functionName );
 
     /// Add a function prototype to be discoverable by callers.
+    KALEIDOSCOPE_API
     void AddFunction( std::unique_ptr< PrototypeAST >& io_prototype );
 
 private:
