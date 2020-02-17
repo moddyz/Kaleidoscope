@@ -1,5 +1,6 @@
 #include <kaleidoscope/KaleidoscopeJIT.h>
 #include <kaleidoscope/codeGenContext.h>
+#include <kaleidoscope/ast.h>
 
 #include <llvm/Transforms/InstCombine/InstCombine.h>
 #include <llvm/Transforms/Scalar.h>
@@ -75,6 +76,31 @@ llvm::legacy::FunctionPassManager* CodeGenContext::GetFunctionPassManager()
 {
     assert( m_passManager != nullptr );
     return m_passManager.get();
+}
+
+llvm::Function* CodeGenContext::GetFunction( const std::string& i_functionName )
+{
+    // Check if the function exists in the *current* module.
+    llvm::Function* func = m_module->getFunction( i_functionName );
+    if ( func != nullptr )
+    {
+        return func;
+    }
+
+    // Check for existing declaration from a *different* module, in m_functionPrototypes.
+    FunctionPrototypeMap::const_iterator funcProtoIt = m_functionPrototypes.find( i_functionName );
+    if ( funcProtoIt != m_functionPrototypes.end() )
+    {
+        return funcProtoIt->second->GenerateCode( *this );
+    }
+
+    // Could not find prototype.
+    return nullptr;
+}
+
+void CodeGenContext::AddFunction( std::unique_ptr< PrototypeAST >& io_prototype )
+{
+    m_functionPrototypes[ io_prototype->GetName() ] = std::move( io_prototype );
 }
 
 } // namespace kaleidoscope

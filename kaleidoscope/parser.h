@@ -37,14 +37,14 @@ private:
     Parser();
 
     /// Internal parsing utilities.
-    std::unique_ptr< ExprAST > ParseExpr();
-    std::unique_ptr< ExprAST > ParseNumericExpr();
-    std::unique_ptr< ExprAST > ParseParenthesisExpr();
-    std::unique_ptr< ExprAST > ParseIdentifierExpr();
-    std::unique_ptr< ExprAST > ParsePrimaryExpr();
-    std::unique_ptr< ExprAST > ParseBinaryOperatorRHS( int i_precendence, std::unique_ptr< ExprAST > io_lhs );
-    std::unique_ptr< PrototypeAST > ParsePrototypeExpr();
-    int ParseCurrentTokenPrecendence();
+    std::unique_ptr< ExprAST > parseExpr();
+    std::unique_ptr< ExprAST > parseNumericExpr();
+    std::unique_ptr< ExprAST > parseParenthesisExpr();
+    std::unique_ptr< ExprAST > parseIdentifierExpr();
+    std::unique_ptr< ExprAST > parsePrimaryExpr();
+    std::unique_ptr< ExprAST > parseBinaryOperatorRHS( int i_precendence, std::unique_ptr< ExprAST > io_lhs );
+    std::unique_ptr< PrototypeAST > parsePrototypeExpr();
+    int parseCurrentTokenPrecendence();
 
     Lexer m_lexer;            /// Internal lexer for token translation.
     int   m_currentToken = 0; /// The current token.

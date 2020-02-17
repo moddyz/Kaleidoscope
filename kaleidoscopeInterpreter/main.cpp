@@ -13,7 +13,7 @@ using namespace kaleidoscope;
 
 typedef double ( *GetDoubleFn )();
 
-void HandleDefinition( Parser& io_parser, CodeGenContext& io_codeGenContext )
+void HandleDefinition( Parser& io_parser, CodeGenContext& io_codeGenContext, llvm::orc::KaleidoscopeJIT& io_jit )
 {
     std::unique_ptr< FunctionAST > expr = io_parser.ParseDefinitionExpr();
     if ( expr != nullptr )
@@ -23,6 +23,8 @@ void HandleDefinition( Parser& io_parser, CodeGenContext& io_codeGenContext )
         {
             fprintf( stderr, "Parsed a function definition.\n" );
             value->print( llvm::errs() );
+            io_jit.addModule( std::move( io_codeGenContext.MoveModule() ) );
+            io_codeGenContext.InitializeModuleWithJIT( io_jit );
             fprintf( stderr, "\n" );
         }
     }
@@ -44,6 +46,7 @@ void HandleExtern( Parser& io_parser, CodeGenContext& io_codeGenContext )
             fprintf( stderr, "Parsed an extern\n" );
             value->print( llvm::errs() );
             fprintf( stderr, "\n" );
+            io_codeGenContext.AddFunction( expr );
         }
     }
     else
@@ -116,7 +119,7 @@ void MainLoop()
             parser.ParseNextToken();
             break;
         case Token_Def:
-            HandleDefinition( parser, codeGenContext );
+            HandleDefinition( parser, codeGenContext, jit );
             break;
         case Token_Extern:
             HandleExtern( parser, codeGenContext );

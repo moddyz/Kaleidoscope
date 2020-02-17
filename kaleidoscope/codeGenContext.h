@@ -14,6 +14,9 @@ class KaleidoscopeJIT;
 
 namespace kaleidoscope
 {
+
+class PrototypeAST;
+
 /// CodeGenContext is a structure storing the internal state
 /// of the generated IR code, and various LLVM objects which
 /// contribute to code-generation.
@@ -61,6 +64,12 @@ public:
     /// Get the function pass manager.
     llvm::legacy::FunctionPassManager* GetFunctionPassManager();
 
+    /// Generate code from an existing function prototype
+    llvm::Function* GetFunction( const std::string& i_functionName );
+
+    /// Add a function prototype to be discoverable by callers.
+    void AddFunction( std::unique_ptr< PrototypeAST >& io_prototype );
+
 private:
     /// Used internally for setting up optimization passes.
     void InitializePassManager();
@@ -77,6 +86,10 @@ private:
     /// Keeps track of values defined in the scope, mapped to their IR.
     /// Currently, only function parameters are referencable.
     std::map< std::string, llvm::Value* > m_namedValuesInScope;
+
+    /// Tracks existing function prototypes which are declared.
+    using FunctionPrototypeMap = std::map< std::string, std::unique_ptr< PrototypeAST > >;
+    FunctionPrototypeMap m_functionPrototypes;
 };
 
 } // namespace kaleidoscope
