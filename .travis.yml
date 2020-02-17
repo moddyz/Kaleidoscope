@@ -4,17 +4,6 @@ os: linux
 
 jobs:
   include:
-    - os: linux
-      dist: bionic
-      compiler: gcc
-      addons:
-        apt:
-          packages:
-            - gcc-6
-            - g++-6
-            - cmake
-            - clang-9
-      env: CXX=g++-6 CC=gcc-6
     - os: osx
       osx_image: xcode11.3
       compiler: clang
@@ -24,6 +13,19 @@ jobs:
             - cmake
             - llvm@9
           update: true
+
+# llvm 9 installation is difficult.
+#   - os: linux
+#     dist: bionic
+#     compiler: gcc
+#     addons:
+#       apt:
+#         packages:
+#           - gcc-6
+#           - g++-6
+#           - cmake
+#           - clang-9
+#     env: CXX=g++-6 CC=gcc-6
 
 install:
   - echo ${PATH}
