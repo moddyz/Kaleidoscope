@@ -38,6 +38,18 @@ int Lexer::GetNextToken()
         {
             return Token_Extern;
         }
+        else if ( m_identifierValue == "if" )
+        {
+            return Token_If;
+        }
+        else if ( m_identifierValue == "then" )
+        {
+            return Token_Then;
+        }
+        else if ( m_identifierValue == "else" )
+        {
+            return Token_Else;
+        }
 
         return Token_Identifier;
     }

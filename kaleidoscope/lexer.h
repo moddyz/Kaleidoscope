@@ -18,11 +18,15 @@ enum Token
 
     // Primary.
     Token_Identifier = -4,
-    Token_Numeric    = -5
+    Token_Numeric    = -5,
+
+    /// Control flow
+    Token_If = -6;
+    Token_Then = -7;
+    Token_Else = -8;
 };
 
-/// The lexer class consumes a block of text to return
-/// identifiable tokens.
+/// The Lexer consumes text and produces identifiable and relevant tokens to then be consumed by the parser.
 class Lexer
 {
 public:
