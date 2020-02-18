@@ -155,4 +155,26 @@ private:
     std::unique_ptr< ExprAST >      m_body;      /// Function body.
 };
 
+/// IfExprAST represents a conditional expression.
+class IfExprAST : public ExprAST
+{
+public:
+    KALEIDOSCOPE_API
+    IfExprAST( std::unique_ptr< ExprAST > i_if, std::unique_ptr< ExprAST > i_then, std::unique< ExprAST > i_else )
+        : m_if( std::move( i_if ) )
+        , m_then( std::move( i_then ) )
+        , m_else( std::move( i_else ) )
+    {
+    }
+
+    /// Generate code for a conditional expression.
+    KALEIDOSCOPE_API
+    llvm::Value* GenerateCode( CodeGenContext& io_context ) override;
+
+private:
+    std::unique_ptr< ExprAST > m_if;   /// Conditional statement
+    std::unique_ptr< ExprAST > m_then; /// Expression if condition == true.
+    std::unique_ptr< ExprAST > m_else; /// Expression if condition == false.
+};
+
 } // namespace kaleidoscope

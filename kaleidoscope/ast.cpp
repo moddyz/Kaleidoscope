@@ -182,4 +182,9 @@ llvm::Function* FunctionAST::GenerateCode( CodeGenContext& io_context )
     return function;
 }
 
+llvm::Value* IfExprAST::GenerateCode( CodeGenContext& io_context )
+{
+
+}
+
 } // namespace kaleidoscope
