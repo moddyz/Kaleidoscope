@@ -138,6 +138,8 @@ std::unique_ptr< ExprAST > Parser::parsePrimaryExpr()
         return parseNumericExpr();
     case '(':
         return parseParenthesisExpr();
+    case Token_If:
+        return parseIfExpr();
     default:
         LogError( "unknown token when expecting an expression: %c", token );
         return nullptr;
@@ -307,6 +309,56 @@ std::unique_ptr< FunctionAST > Parser::ParseTopLevelExpr()
     std::unique_ptr< PrototypeAST > prototypeExpr =
         std::make_unique< PrototypeAST >( "__anon_expr", std::vector< std::string >() );
     return std::make_unique< FunctionAST >( std::move( prototypeExpr ), std::move( expression ) );
+}
+
+std::unique_ptr< ExprAST > Parser::parseIfExpr()
+{
+    // Consume the 'if'
+    ParseNextToken();
+
+    // Parse the conditional expression.
+    std::unique< ExprAST > conditionExpr = parseExpr();
+    if ( conditionExpr == nullptr )
+    {
+        LogError( "Failed to parse conditional expression." );
+        return nullptr;
+    }
+
+    if ( ParseCurrentToken() != Token_Then )
+    {
+        LogError( "Expected 'then' expression." );
+        return nullptr;
+    }
+
+    // Consume 'then'.
+    ParseNextToken();
+
+    // Parse the expression of then.
+    std::unique< ExprAST > thenExpr = parseExpr();
+    if ( thenExpr == nullptr )
+    {
+        LogError( "Failed to parse then expression." );
+        return nullptr;
+    }
+
+    if ( ParseCurrentToken() != Token_Else )
+    {
+        LogError( "Expected 'else' expression." );
+        return nullptr;
+    }
+
+    // Consume 'else'.
+    ParseNextToken();
+
+    // Parse the expression of then.
+    std::unique< ExprAST > elseExpr = parseExpr();
+    if ( elseExpr == nullptr )
+    {
+        LogError( "Failed to parse 'else' expression." );
+        return nullptr;
+    }
+
+    return std::make_unique< IfExprAST >( std::move( conditionExpr ), std::move( thenExpr ), std::move( elseExpr ) );
 }
 
 } // namespace kaleidoscope
