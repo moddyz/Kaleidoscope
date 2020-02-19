@@ -20,10 +20,14 @@ enum Token
     Token_Identifier = -4,
     Token_Numeric    = -5,
 
-    /// Control flow
+    /// Conditional Control flow
     Token_If   = -6,
     Token_Then = -7,
     Token_Else = -8,
+
+    /// For Control flow
+    Token_For = -9
+    Token_In = -10
 };
 
 /// The Lexer consumes text and produces identifiable and relevant tokens to then be consumed by the parser.
