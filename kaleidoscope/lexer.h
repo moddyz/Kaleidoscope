@@ -21,9 +21,9 @@ enum Token
     Token_Numeric    = -5,
 
     /// Control flow
-    Token_If = -6;
-    Token_Then = -7;
-    Token_Else = -8;
+    Token_If   = -6,
+    Token_Then = -7,
+    Token_Else = -8,
 };
 
 /// The Lexer consumes text and produces identifiable and relevant tokens to then be consumed by the parser.

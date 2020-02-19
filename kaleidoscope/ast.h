@@ -160,7 +160,7 @@ class IfExprAST : public ExprAST
 {
 public:
     KALEIDOSCOPE_API
-    IfExprAST( std::unique_ptr< ExprAST > i_if, std::unique_ptr< ExprAST > i_then, std::unique< ExprAST > i_else )
+    IfExprAST( std::unique_ptr< ExprAST > i_if, std::unique_ptr< ExprAST > i_then, std::unique_ptr< ExprAST > i_else )
         : m_if( std::move( i_if ) )
         , m_then( std::move( i_then ) )
         , m_else( std::move( i_else ) )

@@ -317,7 +317,7 @@ std::unique_ptr< ExprAST > Parser::parseIfExpr()
     ParseNextToken();
 
     // Parse the conditional expression.
-    std::unique< ExprAST > conditionExpr = parseExpr();
+    std::unique_ptr< ExprAST > conditionExpr = parseExpr();
     if ( conditionExpr == nullptr )
     {
         LogError( "Failed to parse conditional expression." );
@@ -334,7 +334,7 @@ std::unique_ptr< ExprAST > Parser::parseIfExpr()
     ParseNextToken();
 
     // Parse the expression of then.
-    std::unique< ExprAST > thenExpr = parseExpr();
+    std::unique_ptr< ExprAST > thenExpr = parseExpr();
     if ( thenExpr == nullptr )
     {
         LogError( "Failed to parse then expression." );
@@ -351,7 +351,7 @@ std::unique_ptr< ExprAST > Parser::parseIfExpr()
     ParseNextToken();
 
     // Parse the expression of then.
-    std::unique< ExprAST > elseExpr = parseExpr();
+    std::unique_ptr< ExprAST > elseExpr = parseExpr();
     if ( elseExpr == nullptr )
     {
         LogError( "Failed to parse 'else' expression." );
