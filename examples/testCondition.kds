@@ -1,0 +1,3 @@
+extern foo();
+extern bar();
+def baz(x) if x then foo() else bar();

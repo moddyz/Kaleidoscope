@@ -184,7 +184,73 @@ llvm::Function* FunctionAST::GenerateCode( CodeGenContext& io_context )
 
 llvm::Value* IfExprAST::GenerateCode( CodeGenContext& io_context )
 {
+    llvm::Value* ifValue = m_if->GenerateCode( io_context );
+    if ( ifValue == nullptr )
+    {
+        LogError( "Failed to generate code for if condition." );
+        return nullptr;
+    }
 
+    // Compare if condition != 0.0.
+    ifValue = io_context.GetIRBuilder().CreateFCmpONE(
+        ifValue,
+        llvm::ConstantFP::get( io_context.GetLLVMContext(), llvm::APFloat( 0.0 ) ),
+        "ifcond" );
+
+    // Get the function which this condition resides in.
+    llvm::Function*   function        = io_context.GetIRBuilder().GetInsertBlock()->getParent();
+    llvm::BasicBlock* thenBasicBlock  = llvm::BasicBlock::Create( io_context.GetLLVMContext(), "then", function );
+    llvm::BasicBlock* elseBasicBlock  = llvm::BasicBlock::Create( io_context.GetLLVMContext(), "else" );
+    llvm::BasicBlock* mergeBasicBlock = llvm::BasicBlock::Create( io_context.GetLLVMContext(), "ifcont" );
+
+    // Create branch into 'then' and 'else'
+    io_context.GetIRBuilder().CreateCondBr( ifValue, thenBasicBlock, elseBasicBlock );
+
+    // Generate code for 'then'
+    io_context.GetIRBuilder().SetInsertPoint( thenBasicBlock );
+
+    llvm::Value* thenValue = m_then->GenerateCode( io_context );
+    if ( thenValue == nullptr )
+    {
+        LogError( "Failed to generate code for 'then'." );
+        return nullptr;
+    }
+
+    // Direct 'then' into merge block.
+    io_context.GetIRBuilder().CreateBr( mergeBasicBlock );
+
+    // Generating the 'then' code can change the current block.  Fetch the most up to date block for insertion.
+    thenBasicBlock = io_context.GetIRBuilder().GetInsertBlock();
+
+    // Add else block to the function.
+    function->getBasicBlockList().push_back( elseBasicBlock );
+    io_context.GetIRBuilder().SetInsertPoint( elseBasicBlock );
+
+    llvm::Value* elseValue = m_else->GenerateCode( io_context );
+    if ( elseValue == nullptr )
+    {
+        LogError( "Failed to generate code for 'else'." );
+        return nullptr;
+    }
+
+    // Direct 'else' into merge block.
+    io_context.GetIRBuilder().CreateBr( mergeBasicBlock );
+
+    // Generating the 'else' code can change the current block.  Fetch the most up to date block for insertion.
+    elseBasicBlock = io_context.GetIRBuilder().GetInsertBlock();
+
+    // Emit merge block.
+    function->getBasicBlockList().push_back( mergeBasicBlock );
+    io_context.GetIRBuilder().SetInsertPoint( mergeBasicBlock );
+
+    // Create a PHI node which will consume different values depending on which control was executed.
+    llvm::PHINode* phiNode =
+        io_context.GetIRBuilder().CreatePHI( llvm::Type::getDoubleTy( io_context.GetLLVMContext() ), 2, "iftmp" );
+
+    phiNode->addIncoming( thenValue, thenBasicBlock );
+    phiNode->addIncoming( elseValue, elseBasicBlock );
+
+    return phiNode;
 }
 
 } // namespace kaleidoscope
