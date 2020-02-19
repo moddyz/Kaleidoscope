@@ -50,6 +50,14 @@ int Lexer::GetNextToken()
         {
             return Token_Else;
         }
+        else if ( m_identifierValue == "for" )
+        {
+            return Token_For;
+        }
+        else if ( m_identifierValue == "in" )
+        {
+            return Token_In;
+        }
 
         return Token_Identifier;
     }
