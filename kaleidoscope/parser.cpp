@@ -445,7 +445,11 @@ std::unique_ptr< ExprAST > Parser::parseForExpr()
         return nullptr;
     }
 
-    return std::make_unique< ForExprAST >( variableName, startExpr, endExpr, stepExpr, bodyExpr );
+    return std::make_unique< ForExprAST >( variableName,
+                                           std::move( startExpr ),
+                                           std::move( endExpr ),
+                                           std::move( stepExpr ),
+                                           std::move( bodyExpr ) );
 }
 
 } // namespace kaleidoscope
