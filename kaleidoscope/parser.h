@@ -51,6 +51,7 @@ private:
     std::unique_ptr< ExprAST > parseBinaryOperatorRHS( int i_precendence, std::unique_ptr< ExprAST > io_lhs );
     std::unique_ptr< PrototypeAST > parsePrototypeExpr();
     std::unique_ptr< ExprAST > parseIfExpr();
+    std::unique_ptr< ExprAST > parseForExpr();
     int parseCurrentTokenPrecendence();
 
     Lexer m_lexer;            /// Internal lexer for token translation.

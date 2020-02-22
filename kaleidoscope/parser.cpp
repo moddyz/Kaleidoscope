@@ -140,6 +140,8 @@ std::unique_ptr< ExprAST > Parser::parsePrimaryExpr()
         return parseParenthesisExpr();
     case Token_If:
         return parseIfExpr();
+    case Token_For:
+        return parseForExpr();
     default:
         LogError( "unknown token when expecting an expression: %c", token );
         return nullptr;
@@ -359,6 +361,91 @@ std::unique_ptr< ExprAST > Parser::parseIfExpr()
     }
 
     return std::make_unique< IfExprAST >( std::move( conditionExpr ), std::move( thenExpr ), std::move( elseExpr ) );
+}
+
+std::unique_ptr< ExprAST > Parser::parseForExpr()
+{
+    // Consume 'for'
+    ParseNextToken();
+
+    // Check that we have an variable identifier.
+    if ( ParseCurrentToken() != Token_Identifier )
+    {
+        LogError( "Expected a variable identifier after 'for'." );
+        return nullptr;
+    }
+
+    // Cache identifier, then consume it.
+    std::string variableName = m_lexer.GetIdentifierValue();
+    ParseNextToken();
+
+    // Check for variable value assignment.
+    if ( ParseCurrentToken() != '=' )
+    {
+        LogError( "Expected a '=' after variable identifier." );
+        return nullptr;
+    }
+
+    // Consume '='.
+    ParseNextToken();
+
+    // Parse start expression.
+    std::unique_ptr< ExprAST > startExpr = parseExpr();
+    if ( startExpr == nullptr )
+    {
+        LogError( "Failed to parse start expression." );
+        return nullptr;
+    }
+
+    // Expect a ',' before end check.
+    if ( ParseCurrentToken() != ',' )
+    {
+        LogError( "Expected a ',' after for-loop start expression." );
+        return nullptr;
+    }
+
+    // Consume ','.
+    ParseNextToken();
+
+    // Parse end expression.
+    std::unique_ptr< ExprAST > endExpr = parseExpr();
+    if ( endExpr == nullptr )
+    {
+        LogError( "Failed to parse end expression." );
+        return nullptr;
+    }
+
+    // Optional step value.
+    std::unique_ptr< ExprAST > stepExpr;
+    if ( ParseCurrentToken() == ',' )
+    {
+        stepExpr = parseExpr();
+        if ( stepExpr == nullptr )
+        {
+            LogError( "Failed to parse step expression." );
+            return nullptr;
+        }
+    }
+
+    // Expect an 'in' after the end or step expression
+    if ( ParseCurrentToken() != Token_In )
+    {
+        LogError( "Expected 'in' after for-loop end or step expression." );
+        return nullptr;
+    }
+
+    // Consume 'in'.
+    ParseNextToken();
+
+    // Parse body expression.
+    std::unique_ptr< ExprAST > bodyExpr = parseExpr();
+    if ( bodyExpr == nullptr )
+    {
+        LogError( "Failed to parse body expression." );
+        return nullptr;
+    }
+
+    return std::make_unique< ForExprAST >( variableName, startExpr, endExpr, stepExpr, bodyExpr );
 }
 
 } // namespace kaleidoscope
