@@ -26,7 +26,7 @@ enum Token
     Token_Else = -8,
 
     /// For Control flow
-    Token_For = -9
+    Token_For = -9,
     Token_In = -10
 };
 
