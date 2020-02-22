@@ -177,4 +177,34 @@ private:
     std::unique_ptr< ExprAST > m_else; /// Expression if condition == false.
 };
 
+/// ForExprAST represents a for loop expression.
+class ForExprAST : public ExprAST
+{
+public:
+    KALEIDOSCOPE_API
+    ForExprAST( const std::string&         i_variableName,
+                std::unique_ptr< ExprAST > i_start,
+                std::unique_ptr< ExprAST > i_end,
+                std::unique_ptr< ExprAST > i_step,
+                std::unique_ptr< ExprAST > i_body )
+        : m_variableName( i_variableName )
+        , m_start( std::move( i_start ) )
+        , m_end( std::move( i_end ) )
+        , m_step( std::move( i_step ) )
+        , m_body( std::move( i_body ) )
+    {
+    }
+
+    /// Generate code for a conditional expression.
+    KALEIDOSCOPE_API
+    llvm::Value* GenerateCode( CodeGenContext& io_context ) override;
+
+private:
+    std::string                m_variableName; /// Loop variable name.
+    std::unique_ptr< ExprAST > m_start;        /// Initial value expression.
+    std::unique_ptr< ExprAST > m_end;          /// Expression to check for loop termination.
+    std::unique_ptr< ExprAST > m_step;         /// Increment expression after each iteration of the loop.
+    std::unique_ptr< ExprAST > m_body;         /// Expression to evaluate for for each iteration of the loop.
+};
+
 } // namespace kaleidoscope
