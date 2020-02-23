@@ -253,4 +253,102 @@ llvm::Value* IfExprAST::GenerateCode( CodeGenContext& io_context )
     return phiNode;
 }
 
+llvm::Value* ForExprAST::GenerateCode( CodeGenContext& io_context )
+{
+    // Generate code for start expression.
+    llvm::Value* startVariable = m_start->GenerateCode( io_context );
+    if ( startVariable == nullptr )
+    {
+        LogError( "Failed to generate code for loop start." );
+        return nullptr;
+    }
+
+    llvm::IRBuilder<>& builder     = io_context.GetIRBuilder();
+    llvm::LLVMContext& llvmContext = io_context.GetLLVMContext();
+
+    // Get insertion point by querying parent, because this for-loop could be within another condition or block.
+    llvm::Function*   function            = builder.GetInsertBlock()->getParent();
+    llvm::BasicBlock* preHeaderBasicBlock = builder.GetInsertBlock();
+    llvm::BasicBlock* loopBasicBlock      = llvm::BasicBlock::Create( io_context.GetLLVMContext(), "loop", function );
+
+    // Direct parent block into loop.
+    builder.CreateBr( loopBasicBlock );
+
+    // Start insertion point into loop body.
+    builder.SetInsertPoint( loopBasicBlock );
+
+    // PHI node to store start value.
+    llvm::PHINode* currentVariable =
+        builder.CreatePHI( llvm::Type::getDoubleTy( io_context.GetLLVMContext() ), 2, m_variableName.c_str() );
+    currentVariable->addIncoming( startVariable, preHeaderBasicBlock );
+
+    // The start variable may shadow an existing variable, so cache the old variable.
+    // Insert a new variable to be available in scope.
+    std::map< std::string, llvm::Value* >&                namedValues = io_context.GetNamedValuesInScope();
+    std::map< std::string, llvm::Value* >::const_iterator oldValueIt  = namedValues.find( m_variableName );
+    namedValues[ m_variableName ] = currentVariable;
+
+    // Emit code for body.
+    if ( m_body->GenerateCode( io_context ) == nullptr )
+    {
+        LogError( "Failed to generate code for loop body." );
+        return nullptr;
+    }
+
+    // Optional step expression.
+    llvm::Value* stepValue = nullptr;
+    if ( m_step != nullptr )
+    {
+        stepValue = m_step->GenerateCode( io_context );
+        if ( stepValue == nullptr )
+        {
+            LogError( "Failed to generate code for loop step expression." );
+            return nullptr;
+        }
+    }
+    else
+    {
+        stepValue = llvm::ConstantFP::get( io_context.GetLLVMContext(), llvm::APFloat( 1.0 ) );
+    }
+
+    // Next variable = current variable + step value.
+    llvm::Value* nextVariable = builder.CreateFAdd( currentVariable, stepValue, "nextvar" );
+
+    // Compute the end condition.
+    llvm::Value* endCondition = m_end->GenerateCode( io_context );
+    if ( endCondition == nullptr )
+    {
+        LogError( "Failed to generate code for loop end expression." );
+    }
+
+    // Convert condition to boolean value.
+    endCondition =
+        builder.CreateFCmpONE( endCondition, llvm::ConstantFP::get( llvmContext, llvm::APFloat( 0.0 ) ), "loopcond" );
+
+    // Create after-loop block
+    llvm::BasicBlock* loopEndBasicBlock = builder.GetInsertBlock();
+    llvm::BasicBlock* afterBasicBlock   = llvm::BasicBlock::Create( llvmContext, "afterloop", function );
+
+    // Create condition to check
+    builder.CreateCondBr( endCondition, loopBasicBlock, afterBasicBlock );
+
+    // Set code insertion point to afterLoop basic block.
+    builder.SetInsertPoint( afterBasicBlock );
+
+    // Assign nextVariable to currentVariable.
+    currentVariable->addIncoming( nextVariable, loopEndBasicBlock );
+
+    if ( oldValueIt != namedValues.end() )
+    {
+        namedValues[ m_variableName ] = oldValueIt->second;
+    }
+    else
+    {
+        // Does not shadow a previous variable, so erase it from scope.
+        namedValues.erase( m_variableName );
+    }
+
+    return llvm::Constant::getNullValue( llvm::Type::getDoubleTy( llvmContext ) );
+}
+
 } // namespace kaleidoscope
