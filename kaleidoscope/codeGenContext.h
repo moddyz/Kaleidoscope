@@ -8,6 +8,7 @@
 
 namespace llvm
 {
+class TargetMachine;
 namespace orc
 {
 class KaleidoscopeJIT;
@@ -30,7 +31,7 @@ class PrototypeAST;
 /// - a function pass manager.
 ///
 /// The module and function pass manager are not initialized upon CodeGenContext construction,
-/// Use InitializeModule() in situations which only demand IR code generation.
+/// Use InitializeModule() in situations which only demand IR and/or object code generation.
 /// Or, use InitializeModuleWithJIT() in situations which require both IR code generation and JIT execution.
 ///
 /// MoveModule() facilitates ownership transfer of its module over to the JIT engine.
@@ -52,9 +53,9 @@ public:
     KALEIDOSCOPE_API
     llvm::IRBuilder<>& GetIRBuilder();
 
-    /// Initialize the module.
+    /// Initialize the module with target triple (architecture) and target machine.
     KALEIDOSCOPE_API
-    void InitializeModule();
+    void InitializeModule( const std::string& i_targetTriple, llvm::TargetMachine* i_targetMachine );
 
     /// Initialize the module with data layout based on JIT.
     KALEIDOSCOPE_API
