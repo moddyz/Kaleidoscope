@@ -1,6 +1,6 @@
 #include <kaleidoscope/KaleidoscopeJIT.h>
-#include <kaleidoscope/codeGenContext.h>
 #include <kaleidoscope/ast.h>
+#include <kaleidoscope/codeGenContext.h>
 
 #include <llvm/Transforms/InstCombine/InstCombine.h>
 #include <llvm/Transforms/Scalar.h>
@@ -30,10 +30,12 @@ void CodeGenContext::InitializePassManager()
     m_passManager->doInitialization();
 }
 
-void CodeGenContext::InitializeModule()
+void CodeGenContext::InitializeModule( const std::string& i_targetTriple, llvm::TargetMachine* i_targetMachine )
 {
     assert( m_module == nullptr );
     m_module = std::make_unique< llvm::Module >( "MyModule", m_context );
+    m_module->setDataLayout( i_targetMachine->createDataLayout() );
+    m_module->setTargetTriple( i_targetTriple );
     InitializePassManager();
 }
 
