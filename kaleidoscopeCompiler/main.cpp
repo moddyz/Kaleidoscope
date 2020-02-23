@@ -133,7 +133,7 @@ int main( int i_argc, char** i_argv )
     llvm::raw_fd_ostream dest( objectFile.c_str(), errorCode, llvm::sys::fs::OF_None );
     if ( errorCode )
     {
-        LogError( "Could not open file: %s", errorCode.message() );
+        LogError( "Could not open file: %s", errorCode.message().c_str() );
         return -1;
     }
 
