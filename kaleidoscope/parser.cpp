@@ -419,6 +419,9 @@ std::unique_ptr< ExprAST > Parser::parseForExpr()
     std::unique_ptr< ExprAST > stepExpr;
     if ( ParseCurrentToken() == ',' )
     {
+        // Consume ','
+        ParseNextToken();
+
         stepExpr = parseExpr();
         if ( stepExpr == nullptr )
         {
