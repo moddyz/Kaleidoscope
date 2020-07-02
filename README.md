@@ -26,7 +26,7 @@ Quick build:
 - `>= CMake-3.17`
 - `>= C++17`
 - `doxygen` and `graphviz` (optional for documentation)
-- \>= llvm-9.0.1
+- \>= `llvm-9.0.1`
 
 ## Build Status
 
