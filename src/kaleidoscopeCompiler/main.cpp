@@ -97,7 +97,6 @@ int main( int i_argc, char** i_argv )
     CodeGenContext codeGenContext;
     codeGenContext.InitializeModule( targetTriple, targetMachine );
     std::string lineString;
-    size_t      lineNumber = 0;
     LogInfo( "Compiling '%s'...", sourceFile.c_str() );
     while ( std::getline( fileStream, lineString ) )
     {
