@@ -32,5 +32,5 @@ Quick build:
 
 |       | master | 
 | ----- | ------ | 
-| macOS-10.14 | [![Build Status](https://travis-ci.com/moddyz/CMakeTemplate.svg?branch=master)](https://travis-ci.com/moddyz/CMakeTemplate) |
+| macOS-10.14 | [![Build Status](https://travis-ci.com/moddyz/Kaleidoscope.svg?branch=master)](https://travis-ci.com/moddyz/Kaleidoscope) |
 
